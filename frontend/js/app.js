@@ -1,29 +1,32 @@
 const busqueda = document.getElementById("form-busqueda");
 const inputPokemon = document.getElementById("nombre-pokedex");
 const tarjeta = document.getElementById("tarjeta-pokemon");
-busqueda.addEventListener('submit', async function(e) {
 
-        e.preventDefault();
-        
-        const nombre = inputPokemon.value;
-        if(nombre.length <= 0){
-            alert("Tienes que introducir un nombre");
+let pokemonFavorito;
+busqueda.addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-        }else{
-        try{
-            // 1. Pide los datos (Añade toLowerCase() para evitar errores si escriben "Pikachu")
-            const respuesta = await fetch('https://pokeapi.co/api/v2/pokemon/' + nombre.toLowerCase());
-            
-            // 2. Comprueba si existe (si escriben "agumon" la api da error 404)
-            if(!respuesta.ok) {
-                alert("Pokemon no encontrado");
-                return;
-            }
+  const nombre = inputPokemon.value;
+  if (nombre.length <= 0) {
+    alert("Tienes que introducir un nombre");
+  } else {
+    try {
 
-            // 3. Convierte a JSON
-            const datos = await respuesta.json();
+      const respuesta = await fetch(
+        "https://pokeapi.co/api/v2/pokemon/" + nombre.toLowerCase()
+      );
 
-            tarjeta.innerHTML=`
+      
+      if (!respuesta.ok) {
+        alert("Pokemon no encontrado");
+        return;
+      }
+
+      // 3. Convierte a JSON
+      const datos = await respuesta.json();
+      pokemonFavorito = datos;
+
+      tarjeta.innerHTML = `
         
             <h3>${datos.name}</h3>
             <img src="${datos.sprites.front_default}" alt="pokemon">
@@ -32,8 +35,30 @@ busqueda.addEventListener('submit', async function(e) {
             <button id= "guardar">Añadir a favoritos</button
             `;
 
-        }catch(error){
-            console.log('error al cargar el pokemon', error);
+      const guardar = document.getElementById("guardar");
+
+      guardar.addEventListener("click", async function () {
+
+        const pokemon = {
+        api_id: pokemonFavorito.id,
+        nombre: pokemonFavorito.name,
+        tipo: pokemonFavorito.types[0].type.name,
+        imagen: pokemonFavorito.sprites.front_default,
+      };
+        try {
+          await fetch("backend/agregar-favorito.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(pokemon)
+          });
+          alert(datos.name +  "Guardado en favoritos");
+          
+        } catch (error) {
+          console.error("No se a podido guardar a favoritos", error);
         }
+      });
+    } catch (error) {
+      console.log("error al cargar el pokemon", error);
     }
+  }
 });
