@@ -3,6 +3,7 @@ const inputPokemon = document.getElementById("nombre-pokedex");
 const tarjeta = document.getElementById("tarjeta-pokemon");
 const contenedorFavoritos = document.getElementById("favoritos");
 let pokemonFavorito;
+
 busqueda.addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -11,47 +12,48 @@ busqueda.addEventListener("submit", async function (e) {
     alert("Tienes que introducir un nombre");
   } else {
     try {
-
       const respuesta = await fetch(
         "https://pokeapi.co/api/v2/pokemon/" + nombre.toLowerCase()
       );
 
-      
       if (!respuesta.ok) {
         alert("Pokemon no encontrado");
         return;
       }
 
-      // 3. Convierte a JSON
       const datos = await respuesta.json();
       pokemonFavorito = datos;
 
       tarjeta.innerHTML = `
-        
             <h3>${datos.name}</h3>
             <img src="${datos.sprites.front_default}" alt="pokemon">
             <p>id:${datos.id}</p>
             <p>Tipo:${datos.types[0].type.name}</p>
-            <button id= "guardar">Añadir a favoritos</button
+            <button id="guardar">Añadir a favoritos</button>
             `;
 
       const guardar = document.getElementById("guardar");
 
       guardar.addEventListener("click", async function () {
+        
+        const datosEnviar = new FormData();
+        datosEnviar.append('api_id', pokemonFavorito.id);
+        datosEnviar.append('nombre', pokemonFavorito.name);
+        datosEnviar.append('tipo', pokemonFavorito.types[0].type.name);
+        datosEnviar.append('imagen', pokemonFavorito.sprites.front_default);
 
-        const pokemon = {
-        api_id: pokemonFavorito.id,
-        nombre: pokemonFavorito.name,
-        tipo: pokemonFavorito.types[0].type.name,
-        imagen: pokemonFavorito.sprites.front_default,
-      };
         try {
-          await fetch("backend/agregar-favoritos.php", {
+          const resp = await fetch("backend/agregar-favoritos.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(pokemon)
+            body: datosEnviar
           });
-          alert(datos.name +  " Guardado en favoritos");
+          
+          if(resp.ok){
+             alert(datos.name +  " Guardado en favoritos");
+             mostrarFavoritos();
+          } else {
+             alert("Error al guardar");
+          }
           
         } catch (error) {
           console.error("No se a podido guardar a favoritos", error);
@@ -64,8 +66,6 @@ busqueda.addEventListener("submit", async function (e) {
 });
 
 async function mostrarFavoritos(){
-  
-
   try{
      const respuesta = await fetch('backend/listar-favoritos.php');
 
@@ -78,22 +78,53 @@ async function mostrarFavoritos(){
      let htmlContent = '';
 
     listaFavoritos.forEach(pokemon =>{
-
       htmlContent += `
           <div class ="contenido">
             <h3>${pokemon.nombre}</h3>
             <img src="${pokemon.imagen}" alt="pokemon">
             <p>id:${pokemon.id}</p>
             <p>Tipo:${pokemon.tipo}</p>
-            </div> 
+            <button class="eliminar" data-id="${pokemon.api_id}">Eliminar</button>
+            </div>
             `; 
     });
 
     contenedorFavoritos.innerHTML = htmlContent;
-      
-     
   }catch(error){
     alert("No se a podido mostrar los pokemon favoritos")
   }
 }
 mostrarFavoritos();
+
+contenedorFavoritos.addEventListener('click', (e) => {
+    if(e.target.classList.contains('eliminar')){
+        const idPokemon = e.target.getAttribute('data-id');
+        
+        if(confirm("¿Seguro que quieres liberar a este Pokémon?")){
+            eliminarFavorito(idPokemon);
+        }
+    }
+});
+
+async function eliminarFavorito(id) {
+    try{
+      const datos = new FormData();
+      datos.append('id', id); 
+
+      const respuesta = await fetch('backend/eliminar-favorito.php',{
+        method: 'POST',
+        body: datos
+      });
+
+      if(respuesta.ok){
+        alert("pokemon eliminado de favoritos");
+        mostrarFavoritos();
+      }else{
+        alert("No se pudo eliminar de favoritos");
+      }
+
+    }catch(error){
+      console.error(error);
+      alert("Error de conexion")
+    }
+}
