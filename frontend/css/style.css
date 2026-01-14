@@ -1,0 +1,111 @@
+body {
+    background-color: whitesmoke;
+    font-family: sans-serif;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    color: red;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+#form-busqueda {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid lightgray;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+#nombre-pokedex {
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#form-busqueda button {
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#form-busqueda button:hover {
+    background-color: darkblue;
+}
+
+#favoritos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.contenido, #tarjeta-pokemon div {
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border-top: 5px solid red;
+}
+
+.contenido img, #tarjeta-pokemon img {
+    width: 120px;
+    height: 120px;
+}
+
+.contenido h3, #tarjeta-pokemon h3 {
+    text-transform: capitalize;
+    margin-bottom: 10px;
+}
+
+.contenido p, #tarjeta-pokemon p {
+    background-color: lightgray;
+    padding: 5px;
+    border-radius: 10px;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+#guardar, #btn-guardar {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#guardar:hover {
+    background-color: darkgreen;
+}
+
+.eliminar {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.eliminar:hover {
+    background-color: darkred;
+}

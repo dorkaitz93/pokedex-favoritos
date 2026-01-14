@@ -35,26 +35,24 @@ busqueda.addEventListener("submit", async function (e) {
       const guardar = document.getElementById("guardar");
 
       guardar.addEventListener("click", async function () {
-        
         const datosEnviar = new FormData();
-        datosEnviar.append('api_id', pokemonFavorito.id);
-        datosEnviar.append('nombre', pokemonFavorito.name);
-        datosEnviar.append('tipo', pokemonFavorito.types[0].type.name);
-        datosEnviar.append('imagen', pokemonFavorito.sprites.front_default);
+        datosEnviar.append("api_id", pokemonFavorito.id);
+        datosEnviar.append("nombre", pokemonFavorito.name);
+        datosEnviar.append("tipo", pokemonFavorito.types[0].type.name);
+        datosEnviar.append("imagen", pokemonFavorito.sprites.front_default);
 
         try {
           const resp = await fetch("backend/agregar-favoritos.php", {
             method: "POST",
-            body: datosEnviar
+            body: datosEnviar,
           });
-          
-          if(resp.ok){
-             alert(datos.name +  " Guardado en favoritos");
-             mostrarFavoritos();
+
+          if (resp.ok) {
+            alert(datos.name + " Guardado en favoritos");
+            mostrarFavoritos();
           } else {
-             alert("Error al guardar");
+            alert("Ya existe tu pokemon en favoritos.");
           }
-          
         } catch (error) {
           console.error("No se a podido guardar a favoritos", error);
         }
@@ -65,19 +63,19 @@ busqueda.addEventListener("submit", async function (e) {
   }
 });
 
-async function mostrarFavoritos(){
-  try{
-     const respuesta = await fetch('backend/listar-favoritos.php');
+async function mostrarFavoritos() {
+  try {
+    const respuesta = await fetch("backend/listar-favoritos.php");
 
-     if (!respuesta.ok) {
-        throw new Error("Error en la respuesta del servidor");
+    if (!respuesta.ok) {
+      throw new Error("Error en la respuesta del servidor");
     }
-     const listaFavoritos = await respuesta.json();
+    const listaFavoritos = await respuesta.json();
 
-     contenedorFavoritos.innerHTML = '';
-     let htmlContent = '';
+    contenedorFavoritos.innerHTML = "";
+    let htmlContent = "";
 
-    listaFavoritos.forEach(pokemon =>{
+    listaFavoritos.forEach((pokemon) => {
       htmlContent += `
           <div class ="contenido">
             <h3>${pokemon.nombre}</h3>
@@ -86,45 +84,44 @@ async function mostrarFavoritos(){
             <p>Tipo:${pokemon.tipo}</p>
             <button class="eliminar" data-id="${pokemon.api_id}">Eliminar</button>
             </div>
-            `; 
+            `;
     });
 
     contenedorFavoritos.innerHTML = htmlContent;
-  }catch(error){
-    alert("No se a podido mostrar los pokemon favoritos")
+  } catch (error) {
+    alert("No se a podido mostrar los pokemon favoritos");
   }
 }
 mostrarFavoritos();
 
-contenedorFavoritos.addEventListener('click', (e) => {
-    if(e.target.classList.contains('eliminar')){
-        const idPokemon = e.target.getAttribute('data-id');
-        
-        if(confirm("¿Seguro que quieres liberar a este Pokémon?")){
-            eliminarFavorito(idPokemon);
-        }
+contenedorFavoritos.addEventListener("click", (e) => {
+  if (e.target.classList.contains("eliminar")) {
+    const idPokemon = e.target.getAttribute("data-id");
+
+    if (confirm("¿Seguro que quieres liberar a este Pokémon?")) {
+      eliminarFavorito(idPokemon);
     }
+  }
 });
 
 async function eliminarFavorito(id) {
-    try{
-      const datos = new FormData();
-      datos.append('id', id); 
+  try {
+    const datos = new FormData();
+    datos.append("id", id);
 
-      const respuesta = await fetch('backend/eliminar-favorito.php',{
-        method: 'POST',
-        body: datos
-      });
+    const respuesta = await fetch("backend/eliminar-favorito.php", {
+      method: "POST",
+      body: datos,
+    });
 
-      if(respuesta.ok){
-        alert("pokemon eliminado de favoritos");
-        mostrarFavoritos();
-      }else{
-        alert("No se pudo eliminar de favoritos");
-      }
-
-    }catch(error){
-      console.error(error);
-      alert("Error de conexion")
+    if (respuesta.ok) {
+      alert("pokemon eliminado de favoritos");
+      mostrarFavoritos();
+    } else {
+      alert("No se pudo eliminar de favoritos");
     }
+  } catch (error) {
+    console.error(error);
+    alert("Error de conexion");
+  }
 }
